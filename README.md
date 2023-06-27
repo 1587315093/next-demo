@@ -2,6 +2,8 @@
 
 ## 启动
 
+> yarn 与 node 16.14
+
 #### 使用 `next` 官方提供的 `create-next-app`
 
 ```bash
@@ -123,7 +125,7 @@ export default function UidPage(props: any) {
 }
 ```
 
-与 page 同名的参数名，会被 page 覆盖，如 `http://localhost:3000/999?uid=123` 这样访问，查询参数会被路由参数覆盖
+与 `page` 同名的参数名，会被 `page` 覆盖，如 `http://localhost:3000/999?uid=123` 这样访问，查询参数会被路由参数覆盖
 
 ```tsx
 console.log(query, "query"); // 会在控制台输出 { uid:999}
@@ -155,7 +157,7 @@ console.log(query, "query"); // 会在控制台输出 {uuid: '666'}
 
 无论是 `/catch/6` 还是 `/catch/6/7` 或者 `/catch/6/7/8`, 都会被`[...params].tsx`捕获到
 
-query 数据会以数组形式呈现
+`query` 数据会以数组形式呈现
 
 ```tsx
 //  /catch/6
@@ -174,9 +176,43 @@ console.log(query, "query"); // 会在控制台输出 {"params":["6","7","8"]}
 
 例如，`pages/optional/[[...params]].ts` 将匹配`/optional`、`/optional/a`、`/optional/a/b` 等。
 
-像上面得捕获所有路由的是进如 /catch 路由后如果 pages 下没有 一个动态路由文件 则会 404， 而可选捕获则不会造成 404 原因
+像上面得捕获所有路由的是进如 `/catch` 路由后如果 pages 下没有 一个动态路由文件 则会 404， 而可选捕获则不会造成 404 原因
 
 区别
 
-- [...params].tsx 会捕获所有路由，但是没有路由参数的会造成 访问 /catch 会 404
-- [[...params]].tsx 不会造成 404，可选的意思是他的参数不是必穿的，也就是不穿参数，也能进到 /optional 页面
+- `[...params].tsx` 会捕获所有路由，但是没有路由参数的会造成 访问 `/catch` 会 404
+- `[[...params]].tsx` 不会造成 404，可选的意思是他的参数不是必穿的，也就是不穿参数，也能进到 `/optional` 页面
+
+## 预渲染
+
+预渲染有两种模式
+
+1. `SSG（Static Site Generation）`静态站点生成
+2. `SSR（Server Side Rendering）` 服务端渲染
+
+在预渲染中，服务器在构建时生成静态 HTML 文件，包含了页面的基本结构、样式和部分静态内容。
+当用户请求页面时，服务器直接返回这个已经生成好的静态 HTML 文件，客户端只需要进行少量的交互和数据绑定，从而快速展示页面。
+
+预渲染 与 `CSR（Client Side Rendering）`客户端渲染 的区别
+
+| 预渲染                               | 客户端渲染                                     |
+| ------------------------------------ | ---------------------------------------------- |
+| 返回生成好的 HTML 文件包含结构与样式 | 返回空 HTML 由客户端 JS 加载剩下的续结构与样式 |
+| 在服务端做进行网络请求               | 在客户端进行网络请求                           |
+| 在服务端或者构建时进行页面渲染       | 在客户端浏览器上进行页面渲染                   |
+| 首次加载速度快                       | 首次加载时间较长                               |
+| 数据与交互都要刷新页面               | 更丰富的交互和实时数据更新的能力               |
+
+所以预渲染优点就是
+
+1. 减少客户端压力，如计算与网络请求
+2. 提高了页面的加载速度
+
+而 `Next.js` 提供了两种预渲染方式
+
+1. `SSG` 使用 `getStaticProps`
+2. `SSR` 使用 `getServerSideProps`
+
+#### getStaticProps
+
+#### getServerSideProps
