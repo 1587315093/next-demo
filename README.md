@@ -188,7 +188,7 @@ console.log(query, "query"); // 会在控制台输出 {"params":["6","7","8"]}
 预渲染有两种模式
 
 1. `SSG（Static Site Generation）`静态站点生成
-2. `SSR（Server Side Rendering）` 服务端渲染
+2. `SSR（Server Side Rendering）` 服务端渲染 也被称为 动态渲染
 
 在预渲染中，服务器在构建时生成静态 HTML 文件，包含了页面的基本结构、样式和部分静态内容。
 当用户请求页面时，服务器直接返回这个已经生成好的静态 HTML 文件，客户端只需要进行少量的交互和数据绑定，从而快速展示页面。
@@ -215,4 +215,102 @@ console.log(query, "query"); // 会在控制台输出 {"params":["6","7","8"]}
 
 #### getStaticProps
 
+在 `next` 中，要使页面使用`SSG 静态生成`，只需导出`（export）`页面组件或导出`（export）` `getStaticProps` 函数
+
+HTML 是在 构建时（build time） 生成的
+
+在 `pages` 下创建名为 `ssg` 的目录，然后创建 `index.tsx` 路由，最后得到 `pages/ssg/index.tsx`
+
+书写 SSG 代码，先写个模板
+
+```tsx
+// `pages/ssg/index.tsx`
+
+export default function SSGDemoPage() {
+  return <>SSGDemoPage</>;
+}
+
+export async function getStaticProps() {
+  return {
+    props: {},
+  };
+}
+```
+
+当然现在访问 http://localhost:3000/ssg 只能看到一个 SSGDemoPage 的文字
+
+试着自己填充点数据在`getStaticProps` 中
+
+```tsx
+// `pages/ssg/index.tsx`
+
+export default function SSGDemoPage(props: any) {
+  console.log(props);
+  return (
+    <>
+      <h1> SSGDemoPage</h1>
+      {props.testData}
+    </>
+  );
+}
+
+export async function getStaticProps() {
+  return {
+    props: {
+      testData: 666,
+    },
+  };
+}
+```
+
+可以在页面与控制台中看到 `props.testData` 的数据
+
+所以 `getStaticProps` 返回值会填充到组件的 props 中，而 `getStaticProps` 可以在服务端请求网络直接进行数据注入，数据注入也叫**水合（data hydration）**
+
+来做个请求，在 `getStaticProps` 请求知乎的世界各国大区接口`https://www.zhihu.com/api/v3/oauth/sms/supported_countries`
+
+```tsx
+// `pages/ssg/index.tsx`
+
+export default function SSGDemoPage(props: any) {
+  const { list } = props;
+  console.log(list, "list");
+
+  return (
+    <>
+      <h1>SSGDemoPage</h1>
+      <ul>
+        {list.map((item: any) => (
+          <li key={item.abbr + item.code}>
+            {item.abbr + "  " + item.code + "  " + item.name}
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+}
+
+export async function getStaticProps() {
+  const res = await fetch(
+    "https://www.zhihu.com/api/v3/oauth/sms/supported_countries"
+  );
+  // 返回的数据需要经过.json() 处理
+  const { data = [] } = await res.json();
+
+  return {
+    props: {
+      list: data,
+    },
+  };
+}
+```
+
+然后就可以看到页面循环出来了请求的数据，控制台也能看到
+
+![image](https://github.com/1587315093/next-demo/assets/77056991/6d68c33e-812e-46bc-90c9-1a5b84e41dc7)
+
 #### getServerSideProps
+
+在 `next` 中，要使页面使用`SSR 服务端渲染`，只需导出`（export）`页面组件或导出`（export）` `getServerSideProps` 函数
+
+HTML 是在每个页面请求时生成的
