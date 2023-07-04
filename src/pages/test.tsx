@@ -1,16 +1,28 @@
-export default function Test(props: any) {
-    console.log(props, 'props');
+import Layout from "@/app/layout";
+import { Button, Radio, Space } from "antd-mobile";
 
-    return <h1>test</h1>
+export default function Test(props: any) {
+
+    const handleClick = () => {
+        console.log("handleClick");
+
+    }
+    return (
+        <Layout>
+            <Button>Test</Button>
+            <br />
+            <div onClick={handleClick} style={{ padding: 20, background: 'red' }}>
+                <label>
+                    <input type="radio" />
+                    <div>radio</div>
+                </label>
+            </div>
+        </Layout>
+    );
 }
 
-export async function getServerSideProps(params: any) {
-    console.log('控制台params');
-
-
-    return {
-        props: {
-
-        }
-    }
-}  
+// export async function getServerSideProps(params: any) {
+//     return {
+//         props: {},
+//     };
+// }
