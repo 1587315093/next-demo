@@ -1,12 +1,12 @@
 import Layout from "@/app/layout";
-import { Button, Radio, Space } from "antd-mobile";
+import { Button } from "antd-mobile";
 
 export default function Test(props: any) {
 
     const handleClick = () => {
         console.log("handleClick");
-
     }
+
     return (
         <Layout>
             <Button>Test</Button>
@@ -21,8 +21,8 @@ export default function Test(props: any) {
     );
 }
 
-// export async function getServerSideProps(params: any) {
-//     return {
-//         props: {},
-//     };
-// }
+export async function getServerSideProps(params: any) {
+    return {
+        props: {},
+    };
+}

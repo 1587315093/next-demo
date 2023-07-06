@@ -314,3 +314,44 @@ export async function getStaticProps() {
 在 `next` 中，要使页面使用`SSR 服务端渲染`，只需导出`（export）`页面组件或导出`（export）` `getServerSideProps` 函数
 
 HTML 是在每个页面请求时生成的
+
+在 `pages` 下创建名为 `ssr` 的目录，然后创建 `index.tsx` 路由，最后得到 `pages/ssr/index.tsx`,直接 copy 刚才的 ssg 吧，反正改个渲染模式就行了
+
+只是把 `getStaticProps` 换成了 `getServerSideProps`, 还是请求某乎的接口来渲染
+
+```tsx
+// pages/ssr/index.tsx
+import Layout from "../../app/layout";
+
+export default function SSRDemoPage(props: any) {
+  const { list } = props;
+  console.log(list, "list");
+
+  return (
+    <Layout>
+      <h1>SSRDemoPage</h1>
+      <ul>
+        {list.map((item: any) => (
+          <li key={item.abbr + item.code}>
+            {item.abbr + "  " + item.code + "  " + item.name}
+          </li>
+        ))}
+      </ul>
+    </Layout>
+  );
+}
+
+// ssr
+export async function getServerSideProps() {
+  const res = await fetch(
+    "https://www.zhihu.com/api/v3/oauth/sms/supported_countries"
+  );
+  const { data = [] } = await res.json();
+
+  return {
+    props: {
+      list: data,
+    },
+  };
+}
+```
