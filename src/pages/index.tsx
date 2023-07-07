@@ -1,11 +1,11 @@
-import { useRouter } from "next/router";
+import Layout from "@/app/layout";
 
-
-export default function CidPage(props: any) {
-    const { query } = useRouter()
-    console.log(query, 'query');
-
-    return <h1>CidPage</h1>
+export default function PageIndex(props: any) {
+    return (
+        <Layout>
+            <h1>Hellow PageIndex</h1>
+        </Layout>
+    );
 }
 
 export async function getServerSideProps(context: any) {

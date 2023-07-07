@@ -193,7 +193,7 @@ console.log(query, "query"); // 会在控制台输出 {"params":["6","7","8"]}
 在预渲染中，服务器在构建时生成静态 HTML 文件，包含了页面的基本结构、样式和部分静态内容。
 当用户请求页面时，服务器直接返回这个已经生成好的静态 HTML 文件，客户端只需要进行少量的交互和数据绑定，从而快速展示页面。
 
-预渲染 与 `CSR（Client Side Rendering）`客户端渲染 的区别
+预渲染 与 客户端渲染`CSR（Client Side Rendering）` 的区别
 
 | 预渲染                               | 客户端渲染                                     |
 | ------------------------------------ | ---------------------------------------------- |
@@ -215,7 +215,7 @@ console.log(query, "query"); // 会在控制台输出 {"params":["6","7","8"]}
 
 #### getStaticProps
 
-在 `next` 中，要使页面使用`SSG 静态生成`，只需导出`（export）`页面组件或导出`（export）` `getStaticProps` 函数
+在 `next` 中，要使页面使用`SSG 静态生成`，只需导出`（export）`页面组件与导出`（export）` `getStaticProps` 函数
 
 HTML 是在 构建时（build time） 生成的
 
@@ -289,7 +289,7 @@ export default function SSGDemoPage(props: any) {
     </>
   );
 }
-
+// ssg  此函数在构建时被调用
 export async function getStaticProps() {
   const res = await fetch(
     "https://www.zhihu.com/api/v3/oauth/sms/supported_countries"
@@ -313,7 +313,7 @@ export async function getStaticProps() {
 
 在 `next` 中，要使页面使用`SSR 服务端渲染`，只需导出`（export）`页面组件或导出`（export）` `getServerSideProps` 函数
 
-HTML 是在每个页面请求时生成的
+HTML 是在每个页面请求时生成的，注意是每次
 
 在 `pages` 下创建名为 `ssr` 的目录，然后创建 `index.tsx` 路由，最后得到 `pages/ssr/index.tsx`,直接 copy 刚才的 ssg 吧，反正改个渲染模式就行了
 
@@ -342,7 +342,7 @@ export default function SSRDemoPage(props: any) {
 }
 
 // ssr
-export async function getServerSideProps() {
+export async function getServerSideProps(context: any) {
   const res = await fetch(
     "https://www.zhihu.com/api/v3/oauth/sms/supported_countries"
   );
@@ -352,6 +352,146 @@ export async function getServerSideProps() {
     props: {
       list: data,
     },
+  };
+}
+```
+
+对比 SSG 的话，SSR 非常依赖服务器，因为是每次请求重新生成的，会增加响应速度
+
+#### `getStaticProps`和`getServerSideProps` 的 `context` 形参有什么
+
+- **params:** 一个包含动态路由参数的对象。如果你的页面具有动态路由，那么这个对象将包含从路由中提取的参数。例如，对于路由/posts/[id]，params 可能是 { id: '1' }。
+- **query:** 一个包含查询字符串参数的对象。例如，对于路由/search?keyword=nextjs，query 可能是 { keyword: 'nextjs' }。
+- **req:** HTTP 请求对象，包含有关传入请求的信息。
+- **res:** HTTP 响应对象，包含有关将发送至客户端的响应的信息。
+
+  log 一下 params, query 看看吧，注意这个函数是在服务端执行的，所以 log 可以在终端看到
+
+```tsx
+// pages/index.tsx 的 ssr
+export async function getServerSideProps(context: any) {
+  const { params, query } = context;
+
+  console.log(params, query, "params, query");
+
+  return {
+    props: {},
+  };
+}
+```
+
+访问 `http://localhost:3000/`,然后生成页面时候执行`getServerSideProps`函数
+
+可以看到控制台 log 出了两个参数的信息，因为没用命中动态路由，url 也没 `query` 参数~
+
+![image](https://github.com/1587315093/next-demo/assets/77056991/7f9e41fe-c285-4897-8724-f1ff4403b661)
+
+那么再次访问 `http://localhost:3000?page=123`,再去控制台看
+
+![image](https://github.com/1587315093/next-demo/assets/77056991/713227d0-57ff-434a-91f2-699a19a29f09)
+
+可以看到 `query` 参数了，但是 params 还是没值
+
+访问一个有动态路由的页面，之前建立了 `pages/about/[uuid]` 目录, 访问这个地址 `http://localhost:3000/about/123`，对应页面 `pages/about/[uuid]/index.tsx`
+
+![image](https://github.com/1587315093/next-demo/assets/77056991/f6f7739a-5539-46f1-8102-6b9a658f7209)
+
+然后可以看到 `params` 与 `query` 都获取到了动态路由的值
+
+再访问个多层动态路由的 ， `http://localhost:3000/about/123/321`,对应页面 `pages/about/[uuid]/[cid].tsx`
+
+![image](https://github.com/1587315093/next-demo/assets/77056991/9abd64d2-48eb-4dd3-8884-012bfa7edf74)
+
+可以看到 `params` 与 `query` 把两层路由的值都输出再控制台了
+
+还有很多形参但是感觉不常用，需要时再去翻文档把
+
+而 `res` 则是设置响应信息了，`req` 则是获取请求信息，
+
+`getServerSideProps` 能函数在服务器端执行，所以可以在其实现中访问服务器端的数据库或其他资源，这样的话 `res` 与 `req` 则显得很有用处~
+
+但是 `getStaticProps` 通常在构建时执行，而不是在服务器上。
+
+```tsx
+export async function getServerSideProps(context) {
+  const { req, res } = context;
+
+  // 获取请求的 URL
+  const url = req.url;
+
+  // 获取请求头中的信息
+  const userAgent = req.headers["user-agent"];
+
+  // 设置响应头
+  res.setHeader("Content-Type", "application/json");
+
+  // 设置响应状态码
+  res.status(200);
+
+  // 发送响应内容
+  res.send({ message: "Hello, world!" });
+
+  // ...
+}
+```
+
+- preview:preview 是 true 页面是否处于预览模式，false 否则。请参阅预览模式文档。
+- previewData： 所设置的预览数据 setPreviewData。请参阅预览模式文档。
+- resolvedUrl：请求 URL 的规范化版本，它去除了\_next/data 客户端转换的前缀并包含原始查询值。
+- locale 包含活动区域设置（如果您已启用国际化路由）。
+- locales 包含所有受支持的区域设置（如果您已启用国际化路由）。
+- defaultLocale 包含配置的默认区域设置（如果您已启用国际化路由）。
+
+#### `getStaticProps`和`getServerSideProps` 的返回值
+
+需要 `return` 一个对象
+
+`getServerSideProps`
+
+- props: 传给组件的 props
+- notFound: 标记该页面为未找到状态,意味着虽然页面已命中，但数据获取或其他条件可能导致页面无法正确渲染，从而触发展示 404 页面的逻辑
+- redirect: 一个对象包含两个值 destination 与 permanent;返回这个对象时，服务器会在处理请求时执行重定向操作，将用户导航到指定的页面
+
+1. destination：指定重定向的目标页面路径
+2. permanent：一个布尔值，指示重定向是否是永久性的，`false` 为临时重定向，`true` 为永久
+
+- error: 一个对象，服务器发现错误时的情况
+
+1. statusCode: 错误码，比如设置 500 ，则服务器发现错误会定向到 `pages/500.tsx`
+
+`getStaticProps`
+
+- props: 传给组件的 props
+- revalidate: 设置页面的重新生成的时间间隔（以秒为单位），过期了则会重新生成
+
+```tsx
+// ssr
+export async function getServerSideProps(context: any) {
+  // 从服务器端获取数据并返回
+  return {
+    props: {
+      // 数据对象
+    },
+    // 可选的属性
+    notFound: true,
+    redirect: {
+      destination: "/another-page",
+      permanent: false,
+    },
+    error: {
+      statusCode: 500,
+    },
+  };
+}
+// ssg
+export async function getStaticProps(context: any) {
+  // 预先获取静态数据并返回
+  return {
+    props: {
+      // 静态数据对象
+    },
+    // 可选的属性
+    revalidate: 60, // 重新生成页面的频率（以秒为单位）
   };
 }
 ```

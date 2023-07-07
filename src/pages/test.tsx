@@ -21,7 +21,7 @@ export default function Test(props: any) {
     );
 }
 
-export async function getServerSideProps(params: any) {
+export async function getServerSideProps(context: any) {
     return {
         props: {},
     };
