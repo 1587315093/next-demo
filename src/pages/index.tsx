@@ -2,9 +2,9 @@ import Layout from "@/app/layout";
 
 export default function PageIndex(props: any) {
     return (
-        <Layout>
-            <h1>Hellow PageIndex</h1>
-        </Layout>
+        // <Layout>
+        <h1>Hellow PageIndex</h1>
+        // </Layout>
     );
 }
 

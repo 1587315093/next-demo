@@ -495,3 +495,21 @@ export async function getStaticProps(context: any) {
   };
 }
 ```
+
+## 开发
+
+#### 全局样式
+
+1. 在 pages 下创建 \_app.tsx 做入口组件,然后在里面引入 css,然后全局生效了
+
+```tsx
+// pages/_app.tsx
+import type { AppProps } from "next/app";
+import "../app/globals.css";
+
+export default function App({ Component, pageProps }: AppProps) {
+  return <Component {...pageProps} />;
+}
+```
+
+2. 在 `next` 中好像只能通过一个组件来包裹 `page` 取加载全局样式，因为 `page` 会生成单独的 `html` 的原因
