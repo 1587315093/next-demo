@@ -496,20 +496,44 @@ export async function getStaticProps(context: any) {
 }
 ```
 
-## 开发
+## 开发特性
 
-#### 全局样式
+#### App 根组件
 
-1. 在 pages 下创建 \_app.tsx 做入口组件,然后在里面引入 css,然后全局生效了
+1. 在 pages 下创建 \_app.tsx 做入口根组件
 
 ```tsx
 // pages/_app.tsx
 import type { AppProps } from "next/app";
-import "../app/globals.css";
 
 export default function App({ Component, pageProps }: AppProps) {
   return <Component {...pageProps} />;
 }
 ```
 
-2. 在 `next` 中好像只能通过一个组件来包裹 `page` 取加载全局样式，因为 `page` 会生成单独的 `html` 的原因
+这个也是一个全局的 APP 组件,在官网中它说可以做很多事情
+
+- 页面切换之间保持布局的持久化，(比如一些固定的侧边栏,不变的固定布局)
+- 切换页面时保持状态（state），(想不到什么好实践，感觉鸡肋)
+- 使用 componentDidCatch 自定义错误处理, (app 组件使用 class 组件即可)
+- 向页面（pages）注入额外的数据,( 从 Component 组件传 props)
+- 添加全局 CSS，(在 app 引入 global.css)
+
+```tsx
+// pages/_app.tsx
+import { createContext } from "react";
+import type { AppProps } from "next/app";
+import "../app/globals.css";
+
+export const GlobalContext = createContext({});
+
+export default function App({ Component, pageProps }: AppProps) {
+  return (
+    <GlobalContext.Provider value={{ state: "active" }}>
+      <Component {...pageProps} />
+    </GlobalContext.Provider>
+  );
+}
+```
+
+**注:App 不支持 `getStaticProps` 或 `getServerSideProps`**

@@ -1,10 +1,12 @@
-import Layout from "@/app/layout";
-
+// import Layout from "@/app/layout";
+import { useContext } from "react";
+import { GlobalContext } from "./_app"
 export default function PageIndex(props: any) {
+    const { state, setState } = useContext<any>(GlobalContext)
+
+    console.log(state, 'state');
     return (
-        // <Layout>
-        <h1>Hellow PageIndex</h1>
-        // </Layout>
+        <h1 onClick={() => { setState(2) }}>Hellow PageIndex</h1>
     );
 }
 
