@@ -537,3 +537,4 @@ export default function App({ Component, pageProps }: AppProps) {
 ```
 
 **注:App 不支持 `getStaticProps` 或 `getServerSideProps`**
+
