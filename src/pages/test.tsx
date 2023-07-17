@@ -1,4 +1,4 @@
-import Layout from "@/app/layout";
+import Layout from "app/layout";
 import { Button } from "antd-mobile";
 
 export default function Test(props: any) {
