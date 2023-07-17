@@ -538,3 +538,75 @@ export default function App({ Component, pageProps }: AppProps) {
 
 **注:App 不支持 `getStaticProps` 或 `getServerSideProps`**
 
+#### dynamic 动态导入
+
+前置知识`ES2020` [import()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Statements/import#%E5%8A%A8%E6%80%81%E5%AF%BC%E5%85%A5)
+使用 `next` 提供的 `dynamic`, 类似于`React.lazy`
+
+dynamic 返回的默认组件。它的工作方式类似于常规的 React 组件，可以像平常一样向它传递 props
+
+使用案例，新建`app/components/TestCop` 组件然后通过 dynamic 加 improt()
+
+```tsx
+import dynamic from "next/dynamic";
+
+const TestCop = dynamic(import("../app/components/TestCop"));
+
+export default function PageIndex(props: any) {
+  return (
+    <>
+      <TestCop />
+    </>
+  );
+}
+```
+
+上面的是默认导出的，再看看非默认导出
+
+```tsx
+// 新建一个组件，使用 export 导出不加default
+import React from "react";
+
+export function TestCop2() {
+  return <div>TestCop2</div>;
+}
+```
+
+引入, improt 返回的是 Promise，从 resolve 里能去到 TestCop2 的值，并返回
+
+```tsx
+import dynamic from "next/dynamic";
+
+const TestCop = dynamic(import("../app/components/TestCop"));
+const TestCop2 = dynamic(
+  import("../app/components/TestCop2").then((res) => res.TestCop2)
+);
+
+export default function PageIndex(props: any) {
+  return (
+    <>
+      <TestCop />
+      <TestCop2 />
+    </>
+  );
+}
+```
+
+dynamic 还可以接受多个参数
+
+```tsx
+import dynamic from "next/dynamic";
+
+const TestCop = dynamic(import("../app/components/TestCop"));
+
+export default function PageIndex(props: any) {
+  return (
+    <>
+      <TestCop />
+    </>
+  );
+}
+```
+
+其他参数 
+![image](https://github.com/1587315093/next-demo/assets/77056991/d834ccb6-1e34-460d-8eee-9b7987ff6e22)
