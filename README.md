@@ -608,5 +608,162 @@ export default function PageIndex(props: any) {
 }
 ```
 
-其他参数 
+其他参数
 ![image](https://github.com/1587315093/next-demo/assets/77056991/d834ccb6-1e34-460d-8eee-9b7987ff6e22)
+
+#### next.config.js
+
+这是一个示例的 `next.config.js` 文件，其中包含了前面提到的 29 个配置选项,[官网配置](https://www.nextjs.cn/docs/api-reference/next.config.js/introduction)
+
+```javascript
+module.exports = {
+  // 设置静态资源的前缀路径
+  assetPrefix: "/static",
+
+  // 设置应用程序的基本路径
+  basePath: "/",
+
+  // 启用或禁用服务器端压缩响应的gzip选项
+  compress: true,
+
+  // 配置开发环境下的构建指示器
+  devIndicators: {
+    buildActivity: true,
+    autoPrerender: false,
+  },
+
+  // 配置构建输出目录
+  distDir: "build",
+
+  // 设置环境变量，供客户端和服务器端代码使用
+  env: {
+    CUSTOM_VARIABLE: "custom value",
+  },
+
+  // 配置 ESLint 的选项
+  eslint: {
+    // ESLint 配置选项
+  },
+
+  // 自定义导出静态页面的路径映射
+  exportPathMap: async (
+    defaultPathMap,
+    { dev, dir, outDir, distDir, buildId }
+  ) => {
+    // 导出路径映射逻辑
+    return {
+      "/": { page: "/" },
+      "/about": { page: "/about" },
+    };
+  },
+
+  // 自定义生成的构建 ID
+  generateBuildId: () => {
+    return "custom-build-id";
+  },
+
+  // 配置是否生成 ETags 来支持缓存
+  generateEtags: true,
+
+  // 配置自定义响应头
+  headers: () => {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "max-age=3600",
+          },
+        ],
+      },
+    ];
+  },
+
+  // 配置HTTP请求代理选项
+  httpAgentOptions: {
+    // 请求代理选项
+  },
+
+  // 配置 Next.js 图片优化功能
+  images: {
+    // 图片优化选项
+  },
+
+  // 配置是否在开发环境下按需编译页面
+  onDemandEntries: {
+    // 按需编译选项
+  },
+
+  // 配置构建输出选项
+  output: {
+    // 构建输出选项
+  },
+
+  // 配置页面文件扩展名
+  pageExtensions: ["js", "jsx", "ts", "tsx"],
+
+  // 配置是否显示 "X-Powered-By" 响应头
+  poweredByHeader: true,
+
+  // 配置是否在生产环境中启用浏览器端源映射
+  productionBrowserSourceMaps: false,
+
+  // 配置是否启用 React 严格模式
+  reactStrictMode: true,
+
+  // 配置自定义重定向规则
+  redirects: () => {
+    return [
+      {
+        source: "/old-path",
+        destination: "/new-path",
+        permanent: true,
+      },
+    ];
+  },
+
+  // 配置自定义重写规则
+  rewrites: () => {
+    return [
+      {
+        source: "/api/:path*",
+        destination: "/api-handler",
+      },
+    ];
+  },
+
+  // 配置运行时配置，用于在服务器端和客户端之间共享数据
+  runtimeConfig: {
+    // 运行时配置选项
+  },
+
+  // 配置是否添加末尾斜杠
+  trailingSlash: false,
+
+  // 配置需要在构建过程中进行转译的包
+  transpilePackages: ["package1", "package2"],
+
+  // Turbopack 相关
+  turbo: {},
+
+  // 配置 Next.js 以支持 TypeScript
+  typescript: {
+    // TypeScript 配置选项
+  },
+
+  // 配置是否启用 URL 导入
+  urlImports: {
+    // URL 导入选项
+  },
+
+  // 自定义 Webpack 配置
+  webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+    // Webpack 配置逻辑
+    return config;
+  },
+
+  // 配置是否添加Web Vitals的信息
+  webVitalsAttribution: true,
+};
+```
